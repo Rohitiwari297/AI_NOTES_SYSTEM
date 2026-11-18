@@ -1,0 +1,186 @@
+{
+  "info": {
+    "name": "AI Notes Management API",
+    "description": "Postman Collection for AI Notes Management System (Node.js + Express + MongoDB + JWT)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000" },
+    { "key": "token", "value": "" },
+    { "key": "noteId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "1. Authentication",
+      "item": [
+        {
+          "name": "Register",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.token) {",
+                  "    pm.collectionVariables.set('token', res.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Rahul Kumar\",\n    \"email\": \"rahul@example.com\",\n    \"password\": \"123456\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/register", "host": ["{{baseUrl}}"], "path": ["api", "v1", "auth", "register"] }
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.token) {",
+                  "    pm.collectionVariables.set('token', res.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"rahul@example.com\",\n    \"password\": \"123456\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "v1", "auth", "login"] }
+          }
+        },
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/profile", "host": ["{{baseUrl}}"], "path": ["api", "v1", "auth", "profile"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Notes CRUD",
+      "item": [
+        {
+          "name": "Create Note",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.note && res.note._id) {",
+                  "    pm.collectionVariables.set('noteId', res.note._id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Node js and Docker Architecture\",\n    \"content\": \"Docker helps us containerize our Node.js backend and MongoDB database so that it runs reliably anywhere without dependency issues.\",\n    \"tags\": [\"nodejs\", \"docker\", \"backend\"],\n    \"category\": \"work\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/v1/notes", "host": ["{{baseUrl}}"], "path": ["api", "v1", "notes"] }
+          }
+        },
+        {
+          "name": "Get Notes List (Pagination: page=1&limit=10)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/notes?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "notes"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Single Note by ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/notes/{{noteId}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "notes", "{{noteId}}"] }
+          }
+        },
+        {
+          "name": "Update Note",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Updated Node js and Docker Architecture\",\n    \"category\": \"work\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/v1/notes/{{noteId}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "notes", "{{noteId}}"] }
+          }
+        },
+        {
+          "name": "Delete Note",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/notes/{{noteId}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "notes", "{{noteId}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. AI Features",
+      "item": [
+        {
+          "name": "Generate AI Note Summary (POST /api/notes/:id/summary)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/notes/{{noteId}}/summary", "host": ["{{baseUrl}}"], "path": ["api", "v1", "notes", "{{noteId}}", "summary"] }
+          }
+        },
+        {
+          "name": "Semantic Search (GET /api/notes/search/semantic?q=...)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/notes/search/semantic?q=docker container database",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "notes", "search", "semantic"],
+              "query": [{ "key": "q", "value": "docker container database" }]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
